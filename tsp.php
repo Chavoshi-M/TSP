@@ -16,6 +16,7 @@
 
 			function array_sort($array, $cities, $order = SORT_ٍٍُُِِDESC)
 			{
+				
 				$result = [];
 				$sortable_array = [];
 				if (count($array) > 0) {
