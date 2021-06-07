@@ -16,7 +16,7 @@
 
 			function array_sort($array, $cities, $order = SORT_ٍٍُُِِDESC)
 			{
-				
+
 				$result = [];
 				$sortable_array = [];
 				if (count($array) > 0) {
@@ -47,6 +47,7 @@
 
 				return $result;
 			}
+			
 			function pr($data,$exit=false)
 			{
 				echo "<pre>";
@@ -57,6 +58,7 @@
 				}
 
 			}
+
 			function char($number)
 			{
 				return chr(65+ $number); 
@@ -114,9 +116,7 @@
 						}
 					}
 					$matris.= "</tr>";
-				} 
-				pr($points);
-				pr($array1,1);
+				}  
 				/////////////////////ITERATION = Population اولیه ////////////////////////////////
 				$td = $cities+ 1; 
 				$iteration = [];
