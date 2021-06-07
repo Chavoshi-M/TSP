@@ -13,15 +13,16 @@
 	<div class="main">
 		
 		<?php
-			function array_sort($array, $on, $order = SORT_ٍٍُُِِDESC)
+
+			function array_sort($array, $cities, $order = SORT_ٍٍُُِِDESC)
 			{
-				$new_array = array();
-				$sortable_array = array();
+				$result = [];
+				$sortable_array = [];
 				if (count($array) > 0) {
 					foreach ($array as $k => $v) {
 						if (is_array($v)) {
 							foreach ($v as $k2 => $v2) {
-								if ($k2 == $on) {
+								if ($k2 == $cities) {
 									$sortable_array[$k] = $v2;
 								}
 							}
@@ -39,76 +40,95 @@
 					}
 
 					foreach ($sortable_array as $k => $v) {
-						$new_array[$k] = $array[$k];
+						$result[$k] = $array[$k];
 					}
 				}
 
-				return $new_array;
+				return $result;
 			}
+			function pr($data,$exit=false)
+			{
+				echo "<pre>";
+				print_r($data);
+				echo "</pre>";
+				if($exit){
+					exit();
+				}
+
+			}
+			function char($number)
+			{
+				return chr(65+ $number); 
+			}
+
 			if (isset($_POST['submit'])) {
-				$n = $_POST['city']; //city
+
+				$cities= $_POST['city']; //city
 				$npop = $_POST['npop']; //npop
 				$crossover = $_POST['crossover']; //crossover
 				$nummutation = $_POST['nummutation'];
 				$numiterations = $_POST['iterations'];
 				$result_html = '';  
+				$td_colspan = $cities+ 1; 
+
 				///////////////////////////////////////////////city painting//////////////////
-				$array = array();
-				for ($i = 0; $i < $n; $i++) {
-					$ch = chr(65 + $i);
+
+				$points = [];
+				
+				for ($i = 0; $i < $cities; $i++) {
+					// $ch = char($i);  
 					$randx = rand(-100, 100); //random num for x
 					$randy = rand(-100, 100); //random num for y
-					$array[$i][0] = $randx;
-					$array[$i][1] = $randy;
+					$points[$i][0] = $randx;
+					$points[$i][1] = $randy;
 				}
+				
 				////////////////////////////////////////////matris/////////////////////////
-				$array1 = array(); 
-				$matris= "<tr>";
-				for ($chr = 0; $chr < $n; $chr++) {
-					if ($chr == 0)
-						$matris.= "<td class='color-primary'>City</td>";
-					$ch = chr(65 + $chr); //A,B,C,D,...
-					$matris.= "<td  class='color-secondary'>$ch</td>"; //name of citis
+				$matris = "<tr>
+							<td class='color-primary'>City</td>";
+				for ($i_matris_title = 0; $i_matris_title < $cities; $i_matris_title++) { 
+					$ch = char($i_matris_title); //A,B,C,D,...
+					$matris.= "<td class='color-secondary'>$ch</td>"; //name of citis
 				}
 				$matris.= "</tr>";
-				for ($m = 0; $m < $n; $m++) {
-					$ch = chr(65 + $m); //A,B,C,D,...
+				$array1 = []; 
+				for ($m = 0; $m < $cities; $m++) {
+					$ch = char($m); //A,B,C,D,...
 					$matris.= "<tr><td  class='color-secondary'>$ch</td>"; //name of citis
-					for ($j = 0; $j < $n; $j++) {
-						$chrm = chr(65 + $m);
-						$chrj = chr(65 + $j);
-						$x = $array[$m][0];
-						$x1 = $array[$j][0];
-						$y = $array[$m][1];
-						$y1 = $array[$j][1];
+					for ($j = 0; $j < $cities; $j++) {
+						$chrm = char($m);
+						$chrj = char($j);
+						$x = $points[$m][0];
+						$x1 = $points[$j][0];
+						$y = $points[$m][1];
+						$y1 = $points[$j][1];
 						$rx = ($x1 - $x) * ($x1 - $x);
 						$ry = ($y1 - $y) * ($y1 - $y);
-						$result = round(sqrt($rx + $ry));
-						$array1[$chrm][$chrj] = $result;
+						$total_points = round(sqrt($rx + $ry));
+						$array1[$chrm][$chrj] = $total_points;
 						if ($j == $m) {
-							$matris.= "<td class='color-secondary' >$result</td>";
+							$matris.= "<td class='color-secondary' >$total_points</td>";
 						} else {
-							$matris.= "<td class='color-primary'>$result</td>";
+							$matris.= "<td class='color-primary'>$total_points</td>";
 						}
 					}
 					$matris.= "</tr>";
 				} 
-
+				pr($points);
+				pr($array1,1);
 				/////////////////////ITERATION = Population اولیه ////////////////////////////////
-				$td = $n + 1; 
-				$td_colspan = $n + 1; 
-				$iteration = array();
-				$iteration1 = array();
-				for ($c = 0; $c < $n; $c++) {
-					$chrn = chr(65 + $c);
+				$td = $cities+ 1; 
+				$iteration = [];
+				$iteration1 = [];
+				for ($c = 0; $c < $cities; $c++) {
+					$chrn = char($c);
 					$iteration[$c] = $chrn;
-				} 
-
+				}
 				$npop_html= "";
 				for ($a = 0; $a < $npop; $a++) {
 					$npop_html.= "<tr>";
 					shuffle($iteration);
-					for ($i1 = 0; $i1 < $n; $i1++) {
+					for ($i1 = 0; $i1 < $cities; $i1++) {
 						$iteration1[$a][$i1] = $iteration[$i1];
 						$result1 = $iteration1[$a][$i1];
 
@@ -121,8 +141,8 @@
 					$npop_html.= "</tr>";
 				} 
 				/////////////////////////////Total////////////////////////////////
-				$arrayTotal = array();   
-				$CalculateTotalHtml= "";
+				$arrayTotal = [];   
+				$CalculateTotalHtml = "";
 				for ($d = 0; $d < $npop; $d++) {
 					if ($d % 2 == 0) {
 						$color = 'color-primary';
@@ -131,8 +151,8 @@
 					}
 					$CalculateTotalHtml.= "<tr class='$color' >";
 					$sum = 0;
-					for ($b = 0; $b < $n; $b++) {
-						if ($b + 1 == $n)
+					for ($b = 0; $b < $cities; $b++) {
+						if ($b + 1 == $cities)
 							break;
 						$g = $iteration1[$d][$b];
 						$g1 = $iteration1[$d][$b + 1];
@@ -148,7 +168,7 @@
 					$CalculateTotalHtml.=  "<td >$v</td><td >$start</td><td >$sum</td></tr>";
 				}   
 
-				$sortarray = array_sort($iteration1, $n + 1, SORT_ASC);
+				$sortarray = array_sort($iteration1, $cities+ 1, SORT_ASC);
 				$result_html.= "<table>";
 				$result_html.= "<tr><td class='color-secondary' colspan='$td'> SORT-ASC</td><td class='color-secondary' >Total</td><tr>";
 				$counter = 0;
@@ -166,22 +186,22 @@
 					$counter++;
 				}
 				$result_html.= "</table>"; 
-				$mergearray = array();
+				$mergearray = [];
 
 				for ($t = 2; $t < $numiterations; $t++) {
 					$result_html.= "<div class='new-step'>-------ITERATION STEP-------</div>"; 
 
 
-					for ($l = 0; $l < $n; $l++) {
-						$chr1 = chr(65 + $l);
+					for ($l = 0; $l < $cities; $l++) {
+						$chr1 = char($l);
 						$mergearray[$l] = $chr1;
 					}
 
 					for ($numcross = 0; $numcross < $crossover; $numcross++) {
 						$randcom = rand(0, $npop - 1);
-						$mainslice = array_slice($sortarray[$randcom], 0, $n);
+						$mainslice = array_slice($sortarray[$randcom], 0, $cities);
 						$randcom = rand(0, $npop - 1);
-						$mainslice1 = array_slice($sortarray[$randcom], 0, $n);
+						$mainslice1 = array_slice($sortarray[$randcom], 0, $cities);
 
 						$randcom = rand(1, $npop - 1);
 						$slice = array_slice($mainslice, $randcom);
@@ -201,7 +221,7 @@
 					//print_r($iteration1);
 
 
-					$td = $n + 1;
+					$td = $cities+ 1;
 					$result_html.= "<table >";
 					$result_html.= "<tr><td class='color-secondary'  colspan='$td'> CROSSOVER</td><td class='color-secondary' >Total</td></tr>";
 					$o = $crossover * 2;
@@ -214,8 +234,8 @@
 						$result_html.= "<tr class='$color' >";
 
 						$sum = 0;
-						for ($b = 0; $b < $n; $b++) {
-							if ($b + 1 == $n)
+						for ($b = 0; $b < $cities; $b++) {
+							if ($b + 1 == $cities)
 								break;
 							$g = $iteration1[$dd][$b];
 							$g1 = $iteration1[$dd][$b + 1];
@@ -263,14 +283,14 @@
 						$count = count($iteration1) - 1;
 						$randmution = rand(0, $count);
 						$mutionarray = $iteration1[$randmution];
-						$mutionslice = array_slice($mutionarray, 0, $n);
-						$r1 = rand(0, $n - 1);
-						$r2 = rand(0, $n - 1);
+						$mutionslice = array_slice($mutionarray, 0, $cities);
+						$r1 = rand(0, $cities- 1);
+						$r2 = rand(0, $cities- 1);
 						$h = $mutionslice[$r1];
 						$mutionslice[$r1] = $mutionslice[$r2];
 						$mutionslice[$r2] = $h;
-						for ($b = 0; $b < $n; $b++) {
-							if ($b + 1 == $n)
+						for ($b = 0; $b < $cities; $b++) {
+							if ($b + 1 == $cities)
 								break;
 							$g = $mutionslice[$b];
 							$g1 = $mutionslice[$b + 1];
@@ -295,7 +315,7 @@
 						$counter++;
 					}
 					$result_html.= "</table>"; 
-					$iteration1 = array_sort($iteration1, $n + 1, SORT_ASC);
+					$iteration1 = array_sort($iteration1, $cities+ 1, SORT_ASC);
 					$result_html.= "<table>";
 					$result_html.= "<tr><td class='color-secondary' colspan='$td'> CROSOVER + MUTION + NPOP</td><td class='color-secondary'>Total</td><tr>";
 					$counter = 0;
